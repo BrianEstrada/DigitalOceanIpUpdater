@@ -27,6 +27,14 @@ def validate_config(config):
     has_api_token = "api_token" in config
     has_domain = "domain" in config
     has_record_name = "record_name" in config
+    
+    if not has_api_token:
+        print ("missing 'api_token' field")
+    if not has_domain:
+        print ("missing 'domain' field")
+    if not has_record_name:
+        print ("missing 'record_name' field")
+
     return has_api_token and has_domain and has_record_name
 
 
@@ -132,10 +140,16 @@ def main():
 
     config = get_config()
 
+    if not config:
+        print("Invalid 'config.json'")
+        print("Sync End ==>")
+        return
+
     is_valid_config = validate_config(config)
 
     if not is_valid_config:
         print("Invalid 'config.json'")
+        print("Sync End ==>")
         return
 
     try:
