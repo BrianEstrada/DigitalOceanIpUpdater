@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import time
 import requests
 import re
 import datetime
@@ -142,8 +143,11 @@ def main():
 
     # Sets working path to the scripts directory
     os.chdir(sys.path[0])
-
     print ("Working path " + os.getcwd())
+
+    # Waiting for network to come up
+    print("Sleeping for 60s")
+    time.sleep(60)
 
     config = get_config()
 
