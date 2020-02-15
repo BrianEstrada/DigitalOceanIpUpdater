@@ -5,6 +5,7 @@ import re
 import datetime
 import json
 import os
+import sys
 
 # Make a regular expression
 # for validating an Ip-address
@@ -138,7 +139,11 @@ def main():
     now = datetime.datetime.now()
     print("<=== Start Sync ")
     print("Time - " + str(now))
-    print("cwd " + os.getcwd())
+
+    # Sets working path to the scripts directory
+    os.chdir(sys.path[0])
+
+    print ("Working path " + os.getcwd())
 
     config = get_config()
 
