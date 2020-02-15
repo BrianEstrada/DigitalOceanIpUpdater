@@ -4,6 +4,7 @@ import requests
 import re
 import datetime
 import json
+import os
 
 # Make a regular expression
 # for validating an Ip-address
@@ -27,7 +28,7 @@ def validate_config(config):
     has_api_token = "api_token" in config
     has_domain = "domain" in config
     has_record_name = "record_name" in config
-    
+
     if not has_api_token:
         print ("missing 'api_token' field")
     if not has_domain:
@@ -137,6 +138,7 @@ def main():
     now = datetime.datetime.now()
     print("<=== Start Sync ")
     print("Time - " + str(now))
+    print("cwd " + os.getcwd())
 
     config = get_config()
 
