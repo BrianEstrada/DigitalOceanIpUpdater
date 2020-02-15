@@ -49,7 +49,58 @@ def is_valid_ip(ip):
         return False
 
 
-def submit_ip_address(config, public_ip):
+def get_record_id(config):
+    api_token = config["api_token"]
+    domain = config["domain"]
+    record_name = config["record_name"]
+
+    response = requests.get(
+        "https://api.digitalocean.com/v2/domains/" + domain + "/records",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + api_token
+        }
+    )
+
+    if response:
+        json_data = response.json()
+        print("Get Records Success (count: " + str(json_data["meta"]["total"]) + ")")
+        records = json_data["domain_records"]
+        for record in records:
+            if record_name == record["name"]:
+                return record["id"]
+        return None
+    else:
+        print("Failed getting records")
+        return None
+
+
+def update_record(config, record_id, public_ip):
+    api_token = config["api_token"]
+    domain = config["domain"]
+    record_name = config["record_name"]
+
+    response = requests.put(
+        "https://api.digitalocean.com/v2/domains/" + domain + "/records/" + str(record_id),
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + api_token
+        },
+        json={
+            "type": "A",
+            "name": record_name,
+            "data": public_ip,
+            "ttl": 3600
+        }
+    )
+
+    if response:
+        print("Successfully updating record " + str(record_id))
+    else:
+        print("Failed updating record " + str(record_id))
+
+
+def create_record(config, public_ip):
     api_token = config["api_token"]
     domain = config["domain"]
     record_name = config["record_name"]
@@ -69,9 +120,9 @@ def submit_ip_address(config, public_ip):
     )
 
     if response:
-        print("Successfully updated IP")
+        print("Successfully created record")
     else:
-        print("Failed updating IP")
+        print("Failed creating record")
 
 
 def main():
@@ -89,18 +140,25 @@ def main():
 
     try:
         ip = get_public_ip()
-    except:
-        print("Connection Failed")
+    except Exception, e:
+        print("Error " + str(e))
         print("Sync End ==>")
         return
 
     if not is_valid_ip(ip):
         return
 
+    record_id = get_record_id(config)
+
     try:
-        submit_ip_address(config, ip)
-    except:
-        print("Connection Failed")
+        if record_id:
+            print "Found record with id " + str(record_id)
+            update_record(config, record_id, ip)
+        else:
+            print "No record found creating one"
+            create_record(config, ip)
+    except Exception, e:
+        print("Error " + str(e))
         print("Sync End ==>")
         return
 
